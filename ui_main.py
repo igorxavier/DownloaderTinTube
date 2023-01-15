@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'main.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.1
+## Created by: Qt User Interface Compiler version 6.4.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(753, 527)
+        MainWindow.resize(711, 558)
         MainWindow.setStyleSheet(u"background-color: rgb(25, 0, 255);\n"
 "color: rgb(255, 255, 255);")
         self.centralwidget = QWidget(MainWindow)
@@ -56,12 +56,13 @@ class Ui_MainWindow(object):
         self.btn_menu.setMinimumSize(QSize(70, 0))
         self.btn_menu.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_menu.setStyleSheet(u":hover{\n"
-"	\n"
-"	\n"
-"	background-color: rgb(14, 0, 190);\n"
+"background-color: rgb(14, 0, 190);\n"
 "}\n"
 "*{\n"
-"	border:none;\n"
+"border:none;\n"
+"}\n"
+"QPushButton{\n"
+"background-color: rgb(14, 0, 160);\n"
 "}")
         self.btn_menu.setIconSize(QSize(32, 32))
 
@@ -163,7 +164,7 @@ class Ui_MainWindow(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.list_links.sizePolicy().hasHeightForWidth())
         self.list_links.setSizePolicy(sizePolicy1)
-        self.list_links.setMaximumSize(QSize(300, 16777215))
+        self.list_links.setMaximumSize(QSize(16777215, 16777215))
         self.list_links.setStyleSheet(u"")
         self.list_links.setFrameShape(QFrame.NoFrame)
 
@@ -179,6 +180,58 @@ class Ui_MainWindow(object):
         self.pro_bar.setMinimumSize(QSize(0, 0))
         self.pro_bar.setSizeIncrement(QSize(0, 0))
         self.pro_bar.setBaseSize(QSize(0, 0))
+        palette = QPalette()
+        brush = QBrush(QColor(64, 64, 64, 255))
+        brush.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Active, QPalette.WindowText, brush)
+        brush1 = QBrush(QColor(200, 200, 200, 255))
+        brush1.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Active, QPalette.Button, brush1)
+        palette.setBrush(QPalette.Active, QPalette.Text, brush)
+        palette.setBrush(QPalette.Active, QPalette.ButtonText, brush)
+        palette.setBrush(QPalette.Active, QPalette.Base, brush1)
+        palette.setBrush(QPalette.Active, QPalette.Window, brush1)
+        brush2 = QBrush(QColor(94, 198, 25, 255))
+        brush2.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Active, QPalette.Highlight, brush2)
+        brush3 = QBrush(QColor(64, 64, 64, 128))
+        brush3.setStyle(Qt.SolidPattern)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        palette.setBrush(QPalette.Active, QPalette.PlaceholderText, brush3)
+#endif
+        brush4 = QBrush(QColor(0, 0, 0, 255))
+        brush4.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Inactive, QPalette.WindowText, brush4)
+        brush5 = QBrush(QColor(239, 239, 239, 255))
+        brush5.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Inactive, QPalette.Button, brush5)
+        palette.setBrush(QPalette.Inactive, QPalette.Text, brush4)
+        palette.setBrush(QPalette.Inactive, QPalette.ButtonText, brush4)
+        brush6 = QBrush(QColor(255, 255, 255, 255))
+        brush6.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Inactive, QPalette.Base, brush6)
+        palette.setBrush(QPalette.Inactive, QPalette.Window, brush5)
+        brush7 = QBrush(QColor(48, 140, 198, 255))
+        brush7.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Inactive, QPalette.Highlight, brush7)
+        brush8 = QBrush(QColor(0, 0, 0, 128))
+        brush8.setStyle(Qt.SolidPattern)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        palette.setBrush(QPalette.Inactive, QPalette.PlaceholderText, brush8)
+#endif
+        palette.setBrush(QPalette.Disabled, QPalette.WindowText, brush)
+        palette.setBrush(QPalette.Disabled, QPalette.Button, brush1)
+        palette.setBrush(QPalette.Disabled, QPalette.Text, brush)
+        palette.setBrush(QPalette.Disabled, QPalette.ButtonText, brush)
+        palette.setBrush(QPalette.Disabled, QPalette.Base, brush1)
+        palette.setBrush(QPalette.Disabled, QPalette.Window, brush1)
+        brush9 = QBrush(QColor(145, 145, 145, 255))
+        brush9.setStyle(Qt.SolidPattern)
+        palette.setBrush(QPalette.Disabled, QPalette.Highlight, brush9)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        palette.setBrush(QPalette.Disabled, QPalette.PlaceholderText, brush8)
+#endif
+        self.pro_bar.setPalette(palette)
         self.pro_bar.setStyleSheet(u"border-color: rgb(0, 0, 0);\n"
 "color: rgb(64, 64, 64);")
         self.pro_bar.setValue(0)

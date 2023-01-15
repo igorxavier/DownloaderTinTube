@@ -3,10 +3,9 @@ import os
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtUiTools import QUiLoader
 from pytube import YouTube
+from tiktok_downloader import TikDown
 
 basedir = os.path.dirname(__file__)
-
-
 
 def yt_on_progress(stream, chunk, bytes_remaining):
     """Callback function"""
@@ -18,9 +17,13 @@ def yt_on_progress(stream, chunk, bytes_remaining):
     QtGui.QGuiApplication.processEvents()
     
     
-def baixarItems():
+def baixarItemsYT():
     yt = YouTube('http://youtube.com/watch?v=2lAe1cqCOXo', on_progress_callback=yt_on_progress)
     yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
+
+def baixarItemsTT():
+    d=TikDown('https://www.tiktok.com/@igorlemoes/video/7183034697834958085')
+    d[0].download('video.mp4')
 
 def colarItems():
     clipboard = QtGui.QGuiApplication.clipboard()
@@ -66,7 +69,7 @@ window.btn_menu.setIcon(QtGui.QIcon(os.path.join(basedir, './icons/menu.svg')))
 window.btn_colar.clicked.connect(colarItems)
 window.btn_excluir.clicked.connect(removeSelecionado)
 window.btn_limpar.clicked.connect(limparItems)
-window.btn_baixar.clicked.connect(baixarItems)
+window.btn_baixar.clicked.connect(baixarItemsTT)
 
 window.show()
 
