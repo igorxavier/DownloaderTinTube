@@ -1,4 +1,8 @@
 venv
+wvenv
+env
 .vscode
 *.mp4
 __pycache__
+build
+dist
