@@ -1,11 +1,20 @@
 import os
-
+import sys
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import QFile, QIODevice
 from pytube import YouTube
 from tiktok_downloader import TikDown
 
-basedir = os.path.dirname(__file__)
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def yt_on_progress(stream, chunk, bytes_remaining):
     """Callback function"""
@@ -57,20 +66,34 @@ def animarMenu():
         window.animation.setEasingCurve(QtCore.QEasingCurve.InOutQuart)
         window.animation.start()
 
-loader = QUiLoader()
-app = QtWidgets.QApplication()
-window = loader.load("main.ui", None)
 
 
-# Abrir Menu
-window.btn_menu.clicked.connect(animarMenu)
-window.btn_menu.setIcon(QtGui.QIcon(os.path.join(basedir, './icons/menu.svg')))
-# Botões do Menu
-window.btn_colar.clicked.connect(colarItems)
-window.btn_excluir.clicked.connect(removeSelecionado)
-window.btn_limpar.clicked.connect(limparItems)
-window.btn_baixar.clicked.connect(baixarItemsTT)
 
-window.show()
+if __name__ == "__main__":
+    app = QtWidgets.QApplication(sys.argv)
 
-app.exec()
+    ui_file_name = resource_path("main.ui")
+    ui_file = QFile(ui_file_name)
+    if not ui_file.open(QIODevice.ReadOnly):
+        print(f"Cannot open {ui_file_name}: {ui_file.errorString()}")
+        sys.exit(-1)
+    loader = QUiLoader()
+    window = loader.load(ui_file)
+    ui_file.close()
+    if not window:
+        print(loader.errorString())
+        sys.exit(-1)
+
+
+    # Abrir Menu
+    window.btn_menu.clicked.connect(animarMenu)
+    window.btn_menu.setIcon(QtGui.QIcon(os.path.join(resource_path('./icons/menu.svg'))))
+    # Botões do Menu
+    window.btn_colar.clicked.connect(colarItems)
+    window.btn_excluir.clicked.connect(removeSelecionado)
+    window.btn_limpar.clicked.connect(limparItems)
+    window.btn_baixar.clicked.connect(baixarItemsYT)
+
+    window.show()
+
+    sys.exit(app.exec())
