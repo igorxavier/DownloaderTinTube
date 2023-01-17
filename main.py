@@ -18,10 +18,6 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
-def baixarItemsTT():
-    d=TikDown('https://www.tiktok.com/@igorlemoes/video/7183034697834958085')
-    d[0].download('video.mp4')
-
 def colarItems():
     clipboard = QtGui.QGuiApplication.clipboard()
     originalText = clipboard.text()
@@ -54,6 +50,18 @@ def animarMenu():
         window.animation.setEasingCurve(QtCore.QEasingCurve.InOutQuart)
         window.animation.start()
 
+class DownloaderTT(QThread):
+    new_value = Signal(int)
+    def __init__(self):
+        super(DownloaderTT, self).__init__()
+
+    def run(self):
+        self.new_value.emit(0)
+        d=TikDown('https://www.tiktok.com/@igorlemoes/video/7183034697834958085')
+        d[0].download('video.mp4')
+        
+        self.new_value.emit(100)
+
 class DownloaderYT(QThread):
     new_value = Signal(int)
     def __init__(self):
@@ -84,6 +92,12 @@ def inicar_downloader_yt():
 
 def parar_downloader_yt():
     yt.terminate()
+
+def inicar_downloader_tt():
+    tt.start()
+
+def parar_downloader_tt():
+    tt.terminate()
     
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
@@ -109,12 +123,16 @@ if __name__ == "__main__":
     window.btn_excluir.clicked.connect(removeSelecionado)
     window.btn_limpar.clicked.connect(limparItems)
 
-    window.btn_baixar.clicked.connect(inicar_downloader_yt)
+    window.btn_baixar.clicked.connect(inicar_downloader_tt)
+    # window.btn_baixar.clicked.connect(inicar_downloader_yt)
     
     window.pro_bar.setValue(0)
     
     yt = DownloaderYT()
     yt.new_value.connect(altera_barra)
+
+    tt = DownloaderTT()
+    tt.new_value.connect(altera_barra)
     
     window.show()
 
