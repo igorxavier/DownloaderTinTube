@@ -2,9 +2,10 @@ import os
 import sys
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QIODevice
+from PySide6.QtCore import QFile, QIODevice, QThread, Signal
 from pytube import YouTube
 from tiktok_downloader import TikDown
+import time
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -16,19 +17,6 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-def yt_on_progress(stream, chunk, bytes_remaining):
-    """Callback function"""
-    total_size = stream.filesize
-    bytes_downloaded = total_size - bytes_remaining
-    pct_completed = bytes_downloaded / total_size * 100
-    print(f"Status: {int(pct_completed)} %")
-    window.pro_bar.setValue(int(pct_completed))
-    QtGui.QGuiApplication.processEvents()
-    
-    
-def baixarItemsYT():
-    yt = YouTube('http://youtube.com/watch?v=2lAe1cqCOXo', on_progress_callback=yt_on_progress)
-    yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
 
 def baixarItemsTT():
     d=TikDown('https://www.tiktok.com/@igorlemoes/video/7183034697834958085')
@@ -66,9 +54,37 @@ def animarMenu():
         window.animation.setEasingCurve(QtCore.QEasingCurve.InOutQuart)
         window.animation.start()
 
+class DownloaderYT(QThread):
+    new_value = Signal(int)
+    def __init__(self):
+        super(DownloaderYT, self).__init__()
+
+    def run(self):
+        self.new_value.emit(0)
+        yt = YouTube('http://youtube.com/watch?v=2lAe1cqCOXo', on_progress_callback=self.yt_on_progress)
+        # yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
+        video = yt.streams.get_highest_resolution()
+        video.download()
+
+    def yt_on_progress(self, stream, chunk, bytes_remaining):
+        """Callback function"""
+        total_size = stream.filesize
+        bytes_downloaded = total_size - bytes_remaining
+        pct_completed = bytes_downloaded / total_size * 100
+        print(f"Status: {int(pct_completed)} %")
+        self.new_value.emit(int(pct_completed))
 
 
+def altera_barra(new_value):
+    print(new_value)
+    window.pro_bar.setValue(new_value)
 
+def inicar_downloader_yt():
+    yt.start()
+
+def parar_downloader_yt():
+    yt.terminate()
+    
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
@@ -92,8 +108,14 @@ if __name__ == "__main__":
     window.btn_colar.clicked.connect(colarItems)
     window.btn_excluir.clicked.connect(removeSelecionado)
     window.btn_limpar.clicked.connect(limparItems)
-    window.btn_baixar.clicked.connect(baixarItemsYT)
 
+    window.btn_baixar.clicked.connect(inicar_downloader_yt)
+    
+    window.pro_bar.setValue(0)
+    
+    yt = DownloaderYT()
+    yt.new_value.connect(altera_barra)
+    
     window.show()
 
     sys.exit(app.exec())
