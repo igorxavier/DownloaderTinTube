@@ -7,6 +7,9 @@ from pytube import YouTube
 from tiktok_downloader import TikDown
 import time
 
+##############################################################################
+### Código que resolve os problemas para encontrar arquivos no pyinstaller ###
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -16,6 +19,8 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+###############################################################################
 
 
 def colarItems():
@@ -64,15 +69,17 @@ class DownloaderTT(QThread):
 
 class DownloaderYT(QThread):
     new_value = Signal(int)
+    url = ''
     def __init__(self):
         super(DownloaderYT, self).__init__()
 
     def run(self):
         self.new_value.emit(0)
-        yt = YouTube('http://youtube.com/watch?v=2lAe1cqCOXo', on_progress_callback=self.yt_on_progress)
+        yt = YouTube(self.url, on_progress_callback=self.yt_on_progress)
         # yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
         video = yt.streams.get_highest_resolution()
         video.download()
+        window.list_links.takeItem(0)
 
     def yt_on_progress(self, stream, chunk, bytes_remaining):
         """Callback function"""
@@ -82,10 +89,28 @@ class DownloaderYT(QThread):
         print(f"Status: {int(pct_completed)} %")
         self.new_value.emit(int(pct_completed))
 
+class IniciarLista(QThread):
+    def __init__(self):
+        super(IniciarLista, self).__init__()
+
+    def run(self):
+        if window.list_links.item(0) != None:
+            for x in range(window.list_links.count()):
+                print((window.list_links.item(x).text()))
+
+            while window.list_links.item(0) != None:
+                yt.url = window.list_links.item(0).text()
+                yt.start()
+        else:
+            print('esta vazio')
+
 
 def altera_barra(new_value):
     print(new_value)
     window.pro_bar.setValue(new_value)
+
+def iniciar_lista():
+    iniciar.start()
 
 def inicar_downloader_yt():
     yt.start()
@@ -123,10 +148,13 @@ if __name__ == "__main__":
     window.btn_excluir.clicked.connect(removeSelecionado)
     window.btn_limpar.clicked.connect(limparItems)
 
-    window.btn_baixar.clicked.connect(inicar_downloader_tt)
+    window.btn_baixar.clicked.connect(iniciar_lista)
+    # window.btn_baixar.clicked.connect(inicar_downloader_tt)
     # window.btn_baixar.clicked.connect(inicar_downloader_yt)
     
     window.pro_bar.setValue(0)
+
+    iniciar = IniciarLista()
     
     yt = DownloaderYT()
     yt.new_value.connect(altera_barra)
