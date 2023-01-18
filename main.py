@@ -1,11 +1,14 @@
 import os
 import sys
 from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtWidgets import QFileDialog
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QIODevice, QThread, Signal
 from pytube import YouTube
 from tiktok_downloader import TikDown
-import time
+
+
+salvar_como = '.'
 
 ##############################################################################
 ### Código que resolve os problemas para encontrar arquivos no pyinstaller ###
@@ -57,13 +60,15 @@ def animarMenu():
 
 class DownloaderTT(QThread):
     new_value = Signal(int)
+    url = ''
     def __init__(self):
         super(DownloaderTT, self).__init__()
 
     def run(self):
         self.new_value.emit(0)
-        d=TikDown('https://www.tiktok.com/@igorlemoes/video/7183034697834958085')
-        d[0].download('video.mp4')
+
+        d=TikDown(self.url)
+        d[0].download(salvar_como)
         
         self.new_value.emit(100)
 
@@ -78,7 +83,7 @@ class DownloaderYT(QThread):
         yt = YouTube(self.url, on_progress_callback=self.yt_on_progress)
         # yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
         video = yt.streams.get_highest_resolution()
-        video.download()
+        video.download(salvar_como)
         window.list_links.takeItem(0)
 
     def yt_on_progress(self, stream, chunk, bytes_remaining):
@@ -123,19 +128,55 @@ def inicar_downloader_tt():
 
 def parar_downloader_tt():
     tt.terminate()
+
+##############################################################################
+###  Código para selecionar local para salvar arquivos, salvar como pasta  ###
+
+def onde_salvar():
+    global salvar_como
+    dialog = QFileDialog()
+    dialog.setFileMode(QFileDialog.Directory)
+
+    if dialog.exec_():
+        # fileNames = dialog.selectedFiles()
+        fileNames = dialog.selectedUrls()
+        salvar_como = fileNames[0].fileName()
+
+def exibir_registro():
+    registro.show()
+
+##############################################################################
     
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
-    ui_file_name = resource_path("main.ui")
-    ui_file = QFile(ui_file_name)
-    if not ui_file.open(QIODevice.ReadOnly):
-        print(f"Cannot open {ui_file_name}: {ui_file.errorString()}")
+    ui_main = resource_path("main.ui")
+    ui_registro = resource_path("registro.ui")
+
+    ui_file_main = QFile(ui_main)
+    ui_file_registro = QFile(ui_registro)
+
+    if not ui_file_main.open(QIODevice.ReadOnly):
+        print(f"Cannot open {ui_main}: {ui_file_main.errorString()}")
         sys.exit(-1)
+        
+    if not ui_file_registro.open(QIODevice.ReadOnly):
+        print(f"Cannot open {ui_registro}: {ui_file_registro.errorString()}")
+        sys.exit(-1)
+
     loader = QUiLoader()
-    window = loader.load(ui_file)
-    ui_file.close()
+
+    window = loader.load(ui_file_main)
+    registro = loader.load(ui_file_registro)
+
+    ui_file_main.close()
+    ui_file_registro.close()
+
     if not window:
+        print(loader.errorString())
+        sys.exit(-1)
+    
+    if not registro:
         print(loader.errorString())
         sys.exit(-1)
 
@@ -151,6 +192,9 @@ if __name__ == "__main__":
     window.btn_baixar.clicked.connect(iniciar_lista)
     # window.btn_baixar.clicked.connect(inicar_downloader_tt)
     # window.btn_baixar.clicked.connect(inicar_downloader_yt)
+
+    # window.btn_pasta.clicked.connect(onde_salvar)
+    window.btn_pasta.clicked.connect(exibir_registro)
     
     window.pro_bar.setValue(0)
 
@@ -163,5 +207,6 @@ if __name__ == "__main__":
     tt.new_value.connect(altera_barra)
     
     window.show()
+    
 
     sys.exit(app.exec())
