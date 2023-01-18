@@ -1,0 +1,3 @@
+
+# PARA MACOS INSTALAR VERSÃO DEV
+asdf install python 3.X-DEV
