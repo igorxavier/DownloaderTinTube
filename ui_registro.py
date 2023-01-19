@@ -15,8 +15,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QLabel, QMainWindow, QSizePolicy,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QLabel, QLineEdit, QMainWindow,
+    QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -29,8 +29,31 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.label = QLabel(self.centralwidget)
         self.label.setObjectName(u"label")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
 
         self.verticalLayout.addWidget(self.label)
+
+        self.edit_registro = QLineEdit(self.centralwidget)
+        self.edit_registro.setObjectName(u"edit_registro")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.edit_registro.sizePolicy().hasHeightForWidth())
+        self.edit_registro.setSizePolicy(sizePolicy1)
+        self.edit_registro.setMinimumSize(QSize(0, 0))
+        self.edit_registro.setSizeIncrement(QSize(0, 0))
+        self.edit_registro.setBaseSize(QSize(0, 0))
+
+        self.verticalLayout.addWidget(self.edit_registro)
+
+        self.btn_registrar = QPushButton(self.centralwidget)
+        self.btn_registrar.setObjectName(u"btn_registrar")
+
+        self.verticalLayout.addWidget(self.btn_registrar)
 
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -41,6 +64,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Teste para ver como funciona", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"Digite a chave de acesso", None))
+        self.btn_registrar.setText(QCoreApplication.translate("MainWindow", u"Enviar", None))
     # retranslateUi
 

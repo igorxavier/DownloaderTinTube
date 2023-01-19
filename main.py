@@ -1,12 +1,12 @@
 import os
 import sys
+
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtWidgets import QFileDialog
-from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QIODevice, QThread, Signal
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QFileDialog
 from pytube import YouTube
 from tiktok_downloader import TikDown
-
 
 salvar_como = '.'
 
@@ -142,8 +142,14 @@ def onde_salvar():
         fileNames = dialog.selectedUrls()
         salvar_como = fileNames[0].fileName()
 
-def exibir_registro():
-    registro.show()
+def exibir_window():
+    valor_registro=registro.edit_registro.text()
+    if valor_registro == '12345':
+        window.show()
+        registro.close()
+        
+    print(valor_registro)
+    # window.show()
 
 ##############################################################################
     
@@ -193,8 +199,9 @@ if __name__ == "__main__":
     # window.btn_baixar.clicked.connect(inicar_downloader_tt)
     # window.btn_baixar.clicked.connect(inicar_downloader_yt)
 
-    # window.btn_pasta.clicked.connect(onde_salvar)
-    window.btn_pasta.clicked.connect(exibir_registro)
+    window.btn_pasta.clicked.connect(onde_salvar)
+    
+    registro.btn_registrar.clicked.connect(exibir_window)
     
     window.pro_bar.setValue(0)
 
@@ -206,7 +213,7 @@ if __name__ == "__main__":
     tt = DownloaderTT()
     tt.new_value.connect(altera_barra)
     
-    window.show()
+    registro.show()
     
 
     sys.exit(app.exec())
