@@ -1,19 +1,21 @@
+from __future__ import unicode_literals
+
 import os
+import re
 import sys
 
+import instaloader
+import youtube_dl
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QFile, QIODevice, QThread, Signal
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QFileDialog
-from pytube import YouTube
 from tiktok_downloader import TikDown
-
-salvar_como = '.'
 
 ##############################################################################
 ### Código que resolve os problemas para encontrar arquivos no pyinstaller ###
 
-def resource_path(relative_path):
+def resource_path(relative_path = ''):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
@@ -25,6 +27,7 @@ def resource_path(relative_path):
 
 ###############################################################################
 
+salvar_como = resource_path('baixados')
 
 def colarItems():
     clipboard = QtGui.QGuiApplication.clipboard()
@@ -32,6 +35,32 @@ def colarItems():
     lines = originalText.split(os.linesep)
 
     for line in lines:
+        
+        line = ''.join(line.split())
+        
+        if not line.startswith((
+            'http://youtube.com/',
+            'https://youtube.com/',
+            'http://youtu.be/',
+            'https://youtu.be/',
+            'https://instagram.com/reel/',
+            'http://instagram.com/reel/',
+            'http://tiktok.com/@',
+            'https://tiktok.com/@',
+            'http://www.youtu.be/',
+            'https://www.youtu.be/',
+            'http://www.youtube.com/',
+            'https://www.youtube.com/',
+            'http://www.tiktok.com/@',
+            'https://www.tiktok.com/@',
+            'https://www.instagram.com/reel/',
+            'http://www.instagram.com/reel/',
+            )):
+            continue
+        
+        if window.list_links.findItems(line, QtCore.Qt.MatchExactly):
+            continue
+        
         window.list_links.addItem(line)
         
 def limparItems():
@@ -57,6 +86,41 @@ def animarMenu():
         window.animation.setEndValue(newWidth)
         window.animation.setEasingCurve(QtCore.QEasingCurve.InOutQuart)
         window.animation.start()
+        
+class DownloaderIT(QThread):
+    new_value = Signal(int)
+    url = ''
+    def __init__(self):
+        super(DownloaderIT, self).__init__()
+
+    def run(self):
+
+        loader = instaloader.Instaloader(
+        download_pictures=True,
+        download_videos=True,
+        download_video_thumbnails=False,
+        download_geotags=False,
+        download_comments=False,
+        save_metadata=False,
+        compress_json=False,
+        dirname_pattern=salvar_como,
+        filename_pattern='{profile}/{mediaid}',
+        post_metadata_txt_pattern='',
+        )
+
+        expr = (r'\/reel\/([^\/]*)/') or (r'\/p\/([^\/]*)/')
+        found = re.search(expr, self.url)
+
+        if found:
+            self.new_value.emit(0)
+            
+            print("Baixando ", found.group(1), "...")
+            post = instaloader.Post.from_shortcode(loader.context, found.group(1))
+            loader.download_post(post,'.')
+            
+            self.new_value.emit(100)
+            
+            window.list_links.takeItem(0)
 
 class DownloaderTT(QThread):
     new_value = Signal(int)
@@ -71,6 +135,8 @@ class DownloaderTT(QThread):
         d[0].download(salvar_como)
         
         self.new_value.emit(100)
+        
+        window.list_links.takeItem(0)
 
 class DownloaderYT(QThread):
     new_value = Signal(int)
@@ -80,19 +146,30 @@ class DownloaderYT(QThread):
 
     def run(self):
         self.new_value.emit(0)
-        yt = YouTube(self.url, on_progress_callback=self.yt_on_progress)
-        # yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first().download()
-        video = yt.streams.get_highest_resolution()
-        video.download(salvar_como)
-        window.list_links.takeItem(0)
+        
+        try:
+            
+            ydl_opts = {
+                'format': 'best[ext=mp4][height>720]',
+                'outtmpl': salvar_como +'/'+ '%(title)s' + '.mp4',
+                'progress_hooks': [self.yt_on_progress],
+            }
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([yt.url])
+                
+                window.list_links.takeItem(0)
+                
+        except:
+            print('Não foi possível realizar o download')
+            window.list_links.takeItem(0)
+            return
 
-    def yt_on_progress(self, stream, chunk, bytes_remaining):
-        """Callback function"""
-        total_size = stream.filesize
-        bytes_downloaded = total_size - bytes_remaining
-        pct_completed = bytes_downloaded / total_size * 100
-        print(f"Status: {int(pct_completed)} %")
-        self.new_value.emit(int(pct_completed))
+    def yt_on_progress(self, d):
+        if d['status'] == 'downloading':
+            p = d['_percent_str']
+            p = p.replace('%','').split('.')[0]
+            print(d['filename'], d['_percent_str'], d['_eta_str'])
+            self.new_value.emit(int(p))
 
 class IniciarLista(QThread):
     def __init__(self):
@@ -104,8 +181,40 @@ class IniciarLista(QThread):
                 print((window.list_links.item(x).text()))
 
             while window.list_links.item(0) != None:
-                yt.url = window.list_links.item(0).text()
-                yt.start()
+                
+                if window.list_links.item(0).text().startswith((
+                    'http://youtube.com/',
+                    'https://youtube.com/',
+                    'http://youtu.be/',
+                    'https://youtu.be/',
+                    'http://www.youtu.be/',
+                    'https://www.youtu.be/',
+                    'http://www.youtube.com/',
+                    'https://www.youtube.com/',
+                )):        
+                    yt.url = window.list_links.item(0).text()
+                    yt.start()
+                    
+                elif window.list_links.item(0).text().startswith((
+                    'http://tiktok.com/@',
+                    'https://tiktok.com/@',
+                    'http://www.tiktok.com/@',
+                    'https://www.tiktok.com/@',
+                )):        
+                    tt.url = window.list_links.item(0).text()
+                    tt.start()
+                    
+                elif window.list_links.item(0).text().startswith((
+                    'https://instagram.com/reel/',
+                    'http://instagram.com/reel/',
+                    'https://www.instagram.com/reel/',
+                    'http://www.instagram.com/reel/',
+                )):        
+                    it.url = window.list_links.item(0).text()
+                    it.start()
+                    
+                    
+                    
         else:
             print('esta vazio')
 
@@ -128,6 +237,12 @@ def inicar_downloader_tt():
 
 def parar_downloader_tt():
     tt.terminate()
+    
+def inicar_downloader_it():
+    it.start()
+
+def parar_downloader_it():
+    it.terminate()
 
 ##############################################################################
 ###  Código para selecionar local para salvar arquivos, salvar como pasta  ###
@@ -139,8 +254,11 @@ def onde_salvar():
 
     if dialog.exec_():
         # fileNames = dialog.selectedFiles()
-        fileNames = dialog.selectedUrls()
-        salvar_como = fileNames[0].fileName()
+        fileNames = dialog.directory()
+        print(fileNames.path())
+        salvar_como = fileNames.path()
+        print(salvar_como)
+        window.edit_local.setText(salvar_como)
 
 def exibir_window():
     valor_registro=registro.edit_registro.text()
@@ -201,6 +319,8 @@ if __name__ == "__main__":
 
     window.btn_pasta.clicked.connect(onde_salvar)
     
+    window.edit_local.setText(salvar_como)
+    
     registro.btn_registrar.clicked.connect(exibir_window)
     
     window.pro_bar.setValue(0)
@@ -213,7 +333,9 @@ if __name__ == "__main__":
     tt = DownloaderTT()
     tt.new_value.connect(altera_barra)
     
+    it = DownloaderIT()
+    it.new_value.connect(altera_barra)
+    
     registro.show()
     
-
     sys.exit(app.exec())
