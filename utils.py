@@ -77,7 +77,7 @@ class info_videotiktok:
                 # print("\r[%s%s]" % ('=' * done, ' ' * (100-done)))
         else:
             stream.write(request.content)
-        return None if isinstance(out, (str, BufferedWriter)) else done
+        return None if isinstance(out, (str, BufferedWriter)) else stream
 
     def __str__(self) -> str:
         f = (
