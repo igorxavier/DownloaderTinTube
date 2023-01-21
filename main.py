@@ -10,7 +10,8 @@ from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QFile, QIODevice, QThread, Signal
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QFileDialog
-from tiktok_downloader import TikDown
+from tikdown import TikDown
+import time
 
 ##############################################################################
 ### Código que resolve os problemas para encontrar arquivos no pyinstaller ###
@@ -128,11 +129,17 @@ class DownloaderTT(QThread):
     def __init__(self):
         super(DownloaderTT, self).__init__()
 
+    def tt_on_progress(self, x):
+        self.new_value.emit(int(x))
+
     def run(self):
         self.new_value.emit(0)
 
         d=TikDown(self.url)
-        d[0].download(salvar_como)
+
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+
+        d[0].download(salvar_como+'/'+timestr+'.mp4', bar=self.tt_on_progress)
         
         self.new_value.emit(100)
         
