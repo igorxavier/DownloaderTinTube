@@ -1,17 +1,17 @@
-from __future__ import unicode_literals
-
 import os
 import re
 import sys
+import time
 
 import instaloader
+import requests
 import youtube_dl
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QFile, QIODevice, QThread, Signal
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QFileDialog
+
 from tikdown import TikDown
-import time
 
 ##############################################################################
 ### Código que resolve os problemas para encontrar arquivos no pyinstaller ###
@@ -44,18 +44,23 @@ def colarItems():
             'https://youtube.com/',
             'http://youtu.be/',
             'https://youtu.be/',
-            'https://instagram.com/reel/',
-            'http://instagram.com/reel/',
-            'http://tiktok.com/@',
-            'https://tiktok.com/@',
             'http://www.youtu.be/',
             'https://www.youtu.be/',
             'http://www.youtube.com/',
             'https://www.youtube.com/',
-            'http://www.tiktok.com/@',
-            'https://www.tiktok.com/@',
+            # 'https://www.instagram.com/p/',
+            # 'http://www.instagram.com/p/',
+            'https://instagram.com/reel/',
+            'http://instagram.com/reel/',            
             'https://www.instagram.com/reel/',
             'http://www.instagram.com/reel/',
+            # 'https://instagram.com/p/',
+            # 'http://instagram.com/p/',
+            'http://tiktok.com/@',
+            'https://tiktok.com/@',
+            'http://www.tiktok.com/@',
+            'https://www.tiktok.com/@',
+
             )):
             continue
         
@@ -96,33 +101,52 @@ class DownloaderIT(QThread):
 
     def run(self):
 
-        loader = instaloader.Instaloader(
-        download_pictures=True,
-        download_videos=True,
-        download_video_thumbnails=False,
-        download_geotags=False,
-        download_comments=False,
-        save_metadata=False,
-        compress_json=False,
-        dirname_pattern=salvar_como,
-        filename_pattern='{profile}/{mediaid}',
-        post_metadata_txt_pattern='',
-        )
-
-        expr = (r'\/reel\/([^\/]*)/') or (r'\/p\/([^\/]*)/')
-        found = re.search(expr, self.url)
-
-        if found:
+        obj = instaloader.Instaloader()
+        post = instaloader.Post.from_shortcode(obj.context, self.url.split('reel/')[1].strip('/ '))
+        photo_url = post.url
+        video_url = post.video_url
+        
+        if video_url:
             self.new_value.emit(0)
             
-            print("Baixando ", found.group(1), "...")
-            post = instaloader.Post.from_shortcode(loader.context, found.group(1))
-            loader.download_post(post,'.')
+            response = requests.get(video_url, stream=True,)            
+            total_length = response.headers.get('content-length')
             
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            
+            # download started 
+            with open(salvar_como+'/'+timestr+'.mp4', 'wb') as f:
+                total_length  = response.headers.get('content-length')
+                done = 0
+                if total_length :
+                    dl = 0
+                    total_length = int(total_length )
+                    for data in response.iter_content(1024*20):
+                        dl += len(data)
+                        f.write(data)
+                        done = int(100 * dl / total_length)
+                        # print(done)
+                        # print("\r[%s%s]" % ('=' * done, ' ' * (100-done)))
+                        self.new_value.emit(int(done))
+                else:
+                    f.write(response.content)
+                
             self.new_value.emit(100)
-            
+        
             window.list_links.takeItem(0)
-
+            
+        elif photo_url:
+            self.new_value.emit(0)
+            
+            response = requests.get(photo_url)
+            with open("insta.jpg", "wb") as f:
+                f.write(response.content)
+                
+            self.new_value.emit(100)
+        
+            window.list_links.takeItem(0)
+            
+            
 class DownloaderTT(QThread):
     new_value = Signal(int)
     url = ''
@@ -216,6 +240,10 @@ class IniciarLista(QThread):
                     'http://instagram.com/reel/',
                     'https://www.instagram.com/reel/',
                     'http://www.instagram.com/reel/',
+                    # 'https://instagram.com/p/',
+                    # 'http://instagram.com/p/',
+                    # 'https://www.instagram.com/p/',
+                    # 'http://www.instagram.com/p/',
                 )):        
                     it.url = window.list_links.item(0).text()
                     it.start()
