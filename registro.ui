@@ -6,12 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>409</width>
+    <height>196</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Tela de registro</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">*{
+	background-color: rgb(26, 26, 26);
+}
+QLineEdit, QPushButton, QLabel{
+	color: rgb(255, 255, 255);
+}
+QPushButton{
+	border-radius: 5;
+	background-color: rgb(68, 68, 68);
+}
+QPushButton:hover{
+	background-color: rgb(108, 108, 108);
+}
+QLineEdit{
+	background-color: rgb(225, 225, 225);
+	color: rgb(68, 68, 68);
+}</string>
+  </property>
+  <property name="locale">
+   <locale language="Portuguese" country="Brazil"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -24,12 +46,12 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Digite a chave de acesso</string>
+       <string>Nome:</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="edit_registro">
+     <widget class="QLineEdit" name="edit_nome">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
         <horstretch>0</horstretch>
@@ -39,7 +61,7 @@
       <property name="minimumSize">
        <size>
         <width>0</width>
-        <height>0</height>
+        <height>30</height>
        </size>
       </property>
       <property name="sizeIncrement">
@@ -48,20 +70,88 @@
         <height>0</height>
        </size>
       </property>
-      <property name="baseSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="btn_registrar">
+     <widget class="QLabel" name="label_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="text">
-       <string>Enviar</string>
+       <string>E-mail de compra:</string>
       </property>
      </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="edit_email">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_registrar">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QPushButton{
+	
+	background-color: rgb(85, 170, 127);
+}
+QPushButton:hover{
+	background-color: rgb(62, 125, 93);
+}</string>
+        </property>
+        <property name="text">
+         <string>Registrar</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

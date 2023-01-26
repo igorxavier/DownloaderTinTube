@@ -1,15 +1,15 @@
 import os
-import re
 import sys
 import time
-
+from configs import *
+import getmac
 import instaloader
 import requests
 import youtube_dl
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import QFile, QIODevice, QThread, Signal
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog, QMessageBox
 
 from tikdown import TikDown
 
@@ -27,6 +27,9 @@ def resource_path(relative_path = ''):
     return os.path.join(base_path, relative_path)
 
 ###############################################################################
+
+if not os.path.exists(resource_path('baixados')):
+    os.makedirs(resource_path('baixados'))
 
 salvar_como = resource_path('baixados')
 
@@ -48,14 +51,14 @@ def colarItems():
             'https://www.youtu.be/',
             'http://www.youtube.com/',
             'https://www.youtube.com/',
-            # 'https://www.instagram.com/p/',
-            # 'http://www.instagram.com/p/',
+            'https://www.instagram.com/p/',
+            'http://www.instagram.com/p/',
             'https://instagram.com/reel/',
             'http://instagram.com/reel/',            
             'https://www.instagram.com/reel/',
             'http://www.instagram.com/reel/',
-            # 'https://instagram.com/p/',
-            # 'http://instagram.com/p/',
+            'https://instagram.com/p/',
+            'http://instagram.com/p/',
             'http://tiktok.com/@',
             'https://tiktok.com/@',
             'http://www.tiktok.com/@',
@@ -101,50 +104,68 @@ class DownloaderIT(QThread):
 
     def run(self):
 
-        obj = instaloader.Instaloader()
-        post = instaloader.Post.from_shortcode(obj.context, self.url.split('reel/')[1].strip('/ '))
-        photo_url = post.url
-        video_url = post.video_url
-        
-        if video_url:
-            self.new_value.emit(0)
-            
-            response = requests.get(video_url, stream=True,)            
-            total_length = response.headers.get('content-length')
-            
+        try:
+
+            obj = instaloader.Instaloader()
+
+            if (self.url.find('/reel/') != -1):
+                post = instaloader.Post.from_shortcode(obj.context, self.url.split('reel/')[1].strip('/ '))
+            else:
+                post = instaloader.Post.from_shortcode(obj.context, self.url.split('p/')[1].strip('/ '))
+
+            photo_url = post.url
+            video_url = post.video_url
+
+            if not os.path.exists(salvar_como+'/instagram'):
+                os.makedirs(salvar_como+'/instagram')
+
+            if not os.path.exists(salvar_como+'/instagram/'+post.owner_username):
+                os.makedirs(salvar_como+'/instagram/'+post.owner_username)
+
             timestr = time.strftime("%Y%m%d-%H%M%S")
             
-            # download started 
-            with open(salvar_como+'/'+timestr+'.mp4', 'wb') as f:
-                total_length  = response.headers.get('content-length')
-                done = 0
-                if total_length :
-                    dl = 0
-                    total_length = int(total_length )
-                    for data in response.iter_content(1024*20):
-                        dl += len(data)
-                        f.write(data)
-                        done = int(100 * dl / total_length)
-                        # print(done)
-                        # print("\r[%s%s]" % ('=' * done, ' ' * (100-done)))
-                        self.new_value.emit(int(done))
-                else:
+            if video_url:
+                self.new_value.emit(0)
+                
+                response = requests.get(video_url, stream=True,)            
+                total_length = response.headers.get('content-length')
+                
+                # download started 
+                with open(salvar_como+'/instagram/'+post.owner_username+'/'+timestr+'.mp4', 'wb') as f:
+                    total_length  = response.headers.get('content-length')
+                    done = 0
+                    if total_length :
+                        dl = 0
+                        total_length = int(total_length )
+                        for data in response.iter_content(1024*20):
+                            dl += len(data)
+                            f.write(data)
+                            done = int(100 * dl / total_length)
+                            # print(done)
+                            # print("\r[%s%s]" % ('=' * done, ' ' * (100-done)))
+                            self.new_value.emit(int(done))
+                    else:
+                        f.write(response.content)
+                    
+                self.new_value.emit(100)
+            
+                window.list_links.takeItem(0)
+                
+            elif photo_url:
+                self.new_value.emit(0)
+                
+                response = requests.get(photo_url)
+                with open(salvar_como+'/instagram/'+post.owner_username+'/'+timestr+'.png', "wb") as f:
                     f.write(response.content)
-                
-            self.new_value.emit(100)
-        
-            window.list_links.takeItem(0)
+                    
+                self.new_value.emit(100)
             
-        elif photo_url:
-            self.new_value.emit(0)
-            
-            response = requests.get(photo_url)
-            with open("insta.jpg", "wb") as f:
-                f.write(response.content)
-                
-            self.new_value.emit(100)
-        
+                window.list_links.takeItem(0)
+
+        except:
+            print('Não foi possível realizar o download')
             window.list_links.takeItem(0)
+            return
             
             
 class DownloaderTT(QThread):
@@ -159,15 +180,30 @@ class DownloaderTT(QThread):
     def run(self):
         self.new_value.emit(0)
 
-        d=TikDown(self.url)
+        try:
 
-        timestr = time.strftime("%Y%m%d-%H%M%S")
+            d=TikDown(self.url)
 
-        d[0].download(salvar_como+'/'+timestr+'.mp4', bar=self.tt_on_progress)
-        
-        self.new_value.emit(100)
-        
-        window.list_links.takeItem(0)
+            nome = self.url.partition(".com/@")[2].partition("/video/")[0]
+
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+
+            if not os.path.exists(salvar_como+'/tiktok'):
+                os.makedirs(salvar_como+'/tiktok')
+
+            if not os.path.exists(salvar_como+'/tiktok/'+nome):
+                os.makedirs(salvar_como+'/tiktok/'+nome)
+
+            d[0].download(salvar_como+'/tiktok/'+nome+'/'+timestr+'.mp4', bar=self.tt_on_progress)
+            
+            self.new_value.emit(100)
+            
+            window.list_links.takeItem(0)
+
+        except:
+            print('Não foi possível realizar o download')
+            window.list_links.takeItem(0)
+            return
 
 class DownloaderYT(QThread):
     new_value = Signal(int)
@@ -177,16 +213,19 @@ class DownloaderYT(QThread):
 
     def run(self):
         self.new_value.emit(0)
+
+        if not os.path.exists(salvar_como+'/youtube'):
+            os.makedirs(salvar_como+'/youtube')
         
         try:
             
             ydl_opts = {
-                'format': 'best[ext=mp4][height>720]',
-                'outtmpl': salvar_como +'/'+ '%(title)s' + '.mp4',
+                'format': 'best[ext=mp4][height>480]',
+                'outtmpl': salvar_como+'/youtube/'+ '%(title)s' + '.mp4',
                 'progress_hooks': [self.yt_on_progress],
             }
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([yt.url])
+                ydl.download([self.url])
                 
                 window.list_links.takeItem(0)
                 
@@ -199,7 +238,7 @@ class DownloaderYT(QThread):
         if d['status'] == 'downloading':
             p = d['_percent_str']
             p = p.replace('%','').split('.')[0]
-            print(d['filename'], d['_percent_str'], d['_eta_str'])
+            # print(d['filename'], d['_percent_str'], d['_eta_str'])
             self.new_value.emit(int(p))
 
 class IniciarLista(QThread):
@@ -222,8 +261,30 @@ class IniciarLista(QThread):
                     'https://www.youtu.be/',
                     'http://www.youtube.com/',
                     'https://www.youtube.com/',
-                )):        
-                    yt.url = window.list_links.item(0).text()
+                    'http://youtube.com/shorts/',
+                    'https://youtube.com/shorts/',
+                    'http://youtu.be/shorts/',
+                    'https://youtu.be/shorts/',
+                    'http://www.youtu.be/shorts/',
+                    'https://www.youtu.be/shorts/',
+                    'http://www.youtube.com/shorts/',
+                    'https://www.youtube.com/shorts/',
+                )):
+                    url = window.list_links.item(0).text()
+                    
+                    if url.startswith((
+                        'http://youtube.com/shorts/',
+                        'https://youtube.com/shorts/',
+                        'http://youtu.be/shorts/',
+                        'https://youtu.be/shorts/',
+                        'http://www.youtu.be/shorts/',
+                        'https://www.youtu.be/shorts/',
+                        'http://www.youtube.com/shorts/',
+                        'https://www.youtube.com/shorts/',
+                    )):
+                        url = 'https://youtu.be/' + url.split('shorts/')[1].strip('/ ')
+
+                    yt.url = url
                     yt.start()
                     
                 elif window.list_links.item(0).text().startswith((
@@ -240,44 +301,24 @@ class IniciarLista(QThread):
                     'http://instagram.com/reel/',
                     'https://www.instagram.com/reel/',
                     'http://www.instagram.com/reel/',
-                    # 'https://instagram.com/p/',
-                    # 'http://instagram.com/p/',
-                    # 'https://www.instagram.com/p/',
-                    # 'http://www.instagram.com/p/',
+                    'https://instagram.com/p/',
+                    'http://instagram.com/p/',
+                    'https://www.instagram.com/p/',
+                    'http://www.instagram.com/p/',
                 )):        
                     it.url = window.list_links.item(0).text()
                     it.start()
                     
-                    
-                    
         else:
-            print('esta vazio')
+            print('Esta vazio')
 
 
 def altera_barra(new_value):
-    print(new_value)
+    # print(new_value)
     window.pro_bar.setValue(new_value)
 
 def iniciar_lista():
     iniciar.start()
-
-def inicar_downloader_yt():
-    yt.start()
-
-def parar_downloader_yt():
-    yt.terminate()
-
-def inicar_downloader_tt():
-    tt.start()
-
-def parar_downloader_tt():
-    tt.terminate()
-    
-def inicar_downloader_it():
-    it.start()
-
-def parar_downloader_it():
-    it.terminate()
 
 ##############################################################################
 ###  Código para selecionar local para salvar arquivos, salvar como pasta  ###
@@ -295,14 +336,58 @@ def onde_salvar():
         print(salvar_como)
         window.edit_local.setText(salvar_como)
 
-def exibir_window():
-    valor_registro=registro.edit_registro.text()
-    if valor_registro == '12345':
-        window.show()
+
+def registrador():
+    try:
+        url = url_verifica_mac+getmac.get_mac_address()
+        print(url)
+        register_response = requests.get(url, timeout=5)
+        print(register_response)
+    except:
+        exibir_mbox(
+            'Verifique sua conexão com a internet, não foi possível validar sua licença de uso do software!')
+        sys.exit(0)
+
+
+    if register_response.status_code >= 200 and register_response.status_code <= 299:
         registro.close()
         
-    print(valor_registro)
+        response_update = register_response.json()
+        if response_update['version'] > versao_robo:
+            print(response_update['version'])
+        #     window_download(response_update['version'], response_update['url'])
+        window.show()
+    else:
+        exibir_mbox('Seu registro não foi encontrado, Preencha o Nome e o e-mail utilizados na compra')
+        registro.show()
+
+def retorna_dados_registro():
+    nome=registro.edit_nome.text()
+    email=registro.edit_email.text()
     # window.show()
+    dados = {
+                'nome': nome,
+                'email': email,
+                'codigo': getmac.get_mac_address()
+            }
+    cadastro_response = requests.post(url=url_registro_dados_json, json=dados)
+
+    if cadastro_response.status_code >= 200 and cadastro_response.status_code <= 299:
+        registro.close()
+        window.show()
+    else:
+        registrador()
+
+
+def exibir_mbox(mensagem):
+
+    dlg = QMessageBox()
+    dlg.setWindowTitle("Atenção!")
+    dlg.setText(mensagem)
+    button = dlg.exec_()
+
+    if button == QMessageBox.Ok:
+        print("OK!")
 
 ##############################################################################
     
@@ -340,6 +425,14 @@ if __name__ == "__main__":
         sys.exit(-1)
 
 
+
+    registrador()
+
+    registro.btn_registrar.clicked.connect(retorna_dados_registro)
+
+    
+
+
     # Abrir Menu
     window.btn_menu.clicked.connect(animarMenu)
     window.btn_menu.setIcon(QtGui.QIcon(os.path.join(resource_path('./icons/menu.svg'))))
@@ -349,14 +442,11 @@ if __name__ == "__main__":
     window.btn_limpar.clicked.connect(limparItems)
 
     window.btn_baixar.clicked.connect(iniciar_lista)
-    # window.btn_baixar.clicked.connect(inicar_downloader_tt)
-    # window.btn_baixar.clicked.connect(inicar_downloader_yt)
 
     window.btn_pasta.clicked.connect(onde_salvar)
     
     window.edit_local.setText(salvar_como)
     
-    registro.btn_registrar.clicked.connect(exibir_window)
     
     window.pro_bar.setValue(0)
 
@@ -371,6 +461,5 @@ if __name__ == "__main__":
     it = DownloaderIT()
     it.new_value.connect(altera_barra)
     
-    registro.show()
     
     sys.exit(app.exec())
