@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-from configs import *
+
 import getmac
 import instaloader
 import requests
@@ -11,6 +11,7 @@ from PySide6.QtCore import QFile, QIODevice, QThread, Signal
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 
+from configs import *
 from tikdown import TikDown
 
 ##############################################################################
@@ -360,6 +361,38 @@ def registrador():
     else:
         exibir_mbox('Seu registro não foi encontrado, Preencha o Nome e o e-mail utilizados na compra')
         registro.show()
+        
+def func_verifica_registro():
+    try:
+        print(getmac.get_mac_address())
+        dados = {
+                'id_produto': id_produto,
+                'mac': getmac.get_mac_address()
+            }
+        retorno_verifica_registro = requests.post(url=url_verifica_registro, json=dados)
+    except:
+        exibir_mbox(
+            'Verifique sua conexão com a internet, não foi possível validar sua licença de uso do software!')
+        sys.exit(0)
+
+
+    if retorno_verifica_registro.status_code >= 200 and retorno_verifica_registro.status_code <= 299:
+        registro.close()
+        
+        response_update = retorno_verifica_registro.json()
+        if response_update['version'] > versao_robo:
+            print(response_update['version'])
+        #     window_download(response_update['version'], response_update['url'])
+            avisos.lbl_msg.setText(response_update['mensagem'])
+            
+            urlLink="<a href="+response_update['url']+">"+response_update['url']+"</a>"
+            avisos.lbl_link.setText(urlLink)
+            window.show()
+            avisos.show()
+        window.show()
+    else:
+        exibir_mbox('Seu registro não foi encontrado, Preencha o Nome e o e-mail utilizados na compra')
+        registro.show()
 
 def retorna_dados_registro():
     nome=registro.edit_nome.text()
@@ -368,15 +401,16 @@ def retorna_dados_registro():
     dados = {
                 'nome': nome,
                 'email': email,
-                'codigo': getmac.get_mac_address()
+                'id_produto': id_produto,
+                'mac': getmac.get_mac_address()
             }
-    cadastro_response = requests.post(url=url_registro_dados_json, json=dados)
+    cadastro_response = requests.post(url=url_verifica_email_e_registra, json=dados)
 
     if cadastro_response.status_code >= 200 and cadastro_response.status_code <= 299:
         registro.close()
         window.show()
     else:
-        registrador()
+        func_verifica_registro()
 
 
 def exibir_mbox(mensagem):
@@ -396,9 +430,11 @@ if __name__ == "__main__":
 
     ui_main = resource_path("main.ui")
     ui_registro = resource_path("registro.ui")
+    ui_avisos = resource_path("avisos.ui")
 
     ui_file_main = QFile(ui_main)
     ui_file_registro = QFile(ui_registro)
+    ui_file_avisos = QFile(ui_avisos)
 
     if not ui_file_main.open(QIODevice.ReadOnly):
         print(f"Cannot open {ui_main}: {ui_file_main.errorString()}")
@@ -407,14 +443,20 @@ if __name__ == "__main__":
     if not ui_file_registro.open(QIODevice.ReadOnly):
         print(f"Cannot open {ui_registro}: {ui_file_registro.errorString()}")
         sys.exit(-1)
+        
+    if not ui_file_avisos.open(QIODevice.ReadOnly):
+        print(f"Cannot open {ui_avisos}: {ui_file_avisos.errorString()}")
+        sys.exit(-1)
 
     loader = QUiLoader()
 
     window = loader.load(ui_file_main)
     registro = loader.load(ui_file_registro)
+    avisos = loader.load(ui_file_avisos)
 
     ui_file_main.close()
     ui_file_registro.close()
+    ui_file_avisos.close()
 
     if not window:
         print(loader.errorString())
@@ -423,10 +465,15 @@ if __name__ == "__main__":
     if not registro:
         print(loader.errorString())
         sys.exit(-1)
+        
+    if not avisos:
+        print(loader.errorString())
+        sys.exit(-1)
 
 
 
-    registrador()
+    # registrador()
+    func_verifica_registro()
 
     registro.btn_registrar.clicked.connect(retorna_dados_registro)
 
