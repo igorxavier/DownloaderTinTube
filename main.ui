@@ -210,7 +210,11 @@
    </palette>
   </property>
   <property name="windowTitle">
-   <string>Multi Downloader</string>
+   <string>SaveVideo</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/savevideo.ico</normaloff>icons/savevideo.ico</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">*{
@@ -309,15 +313,23 @@ QPushButton:hover{
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
              <widget class="QLabel" name="lbl_titulo">
+              <property name="font">
+               <font>
+                <pointsize>23</pointsize>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: rgb(85, 170, 127);</string>
+              </property>
               <property name="text">
-               <string>Multi Downloader</string>
+               <string>SaveVideo</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QLabel" name="lbl_desc">
               <property name="text">
-               <string>Baixe Vídeos Do TikTok, Instagram e Youtube</string>
+               <string>Baixe Vídeos Em Lote Do TikTok, Instagram e Youtube</string>
               </property>
              </widget>
             </item>
@@ -1061,10 +1073,29 @@ color: rgb(64, 64, 64);</string>
          <property name="spacing">
           <number>0</number>
          </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
          <item>
           <widget class="QLabel" name="lbl_rodape">
            <property name="text">
-            <string>Suporte</string>
+            <string>Desenvolvido por Igor Lemões - Contato em todas as redes sociais - Suporte via WhatApp (53) 99156-5693</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Licença para uso pessoal e intransferível | https://robozinhos.com.br | https://igorlemoes.com.br</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>

@@ -60,6 +60,9 @@ class Ui_MainWindow(object):
         brush5.setStyle(Qt.SolidPattern)
         palette.setBrush(QPalette.Disabled, QPalette.Highlight, brush5)
         MainWindow.setPalette(palette)
+        icon = QIcon()
+        icon.addFile(u"icons/savevideo.ico", QSize(), QIcon.Normal, QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet(u"*{\n"
 "	background-color: rgb(26, 26, 26);\n"
 "}\n"
@@ -109,6 +112,10 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.lbl_titulo = QLabel(self.qlin1_2)
         self.lbl_titulo.setObjectName(u"lbl_titulo")
+        font = QFont()
+        font.setPointSize(23)
+        self.lbl_titulo.setFont(font)
+        self.lbl_titulo.setStyleSheet(u"color: rgb(85, 170, 127);")
 
         self.verticalLayout_3.addWidget(self.lbl_titulo)
 
@@ -178,9 +185,9 @@ class Ui_MainWindow(object):
         sizePolicy1.setHeightForWidth(self.edit_local.sizePolicy().hasHeightForWidth())
         self.edit_local.setSizePolicy(sizePolicy1)
         self.edit_local.setMinimumSize(QSize(0, 30))
-        font = QFont()
-        font.setPointSize(10)
-        self.edit_local.setFont(font)
+        font1 = QFont()
+        font1.setPointSize(10)
+        self.edit_local.setFont(font1)
         self.edit_local.setStyleSheet(u"background-color: rgb(188, 187, 188);\n"
 "color: rgb(51, 52, 52);\n"
 "border: none;")
@@ -260,9 +267,9 @@ class Ui_MainWindow(object):
         brush10.setStyle(Qt.SolidPattern)
         palette1.setBrush(QPalette.Disabled, QPalette.Link, brush10)
         self.list_links.setPalette(palette1)
-        font1 = QFont()
-        font1.setPointSize(12)
-        self.list_links.setFont(font1)
+        font2 = QFont()
+        font2.setPointSize(12)
+        self.list_links.setFont(font2)
         self.list_links.setFrameShape(QFrame.NoFrame)
         self.list_links.setGridSize(QSize(0, 22))
 
@@ -346,10 +353,18 @@ class Ui_MainWindow(object):
         self.qlin3 = QVBoxLayout()
         self.qlin3.setSpacing(0)
         self.qlin3.setObjectName(u"qlin3")
+        self.qlin3.setContentsMargins(-1, 5, -1, 5)
         self.lbl_rodape = QLabel(self.widget)
         self.lbl_rodape.setObjectName(u"lbl_rodape")
+        self.lbl_rodape.setAlignment(Qt.AlignCenter)
 
         self.qlin3.addWidget(self.lbl_rodape)
+
+        self.label = QLabel(self.widget)
+        self.label.setObjectName(u"label")
+        self.label.setAlignment(Qt.AlignCenter)
+
+        self.qlin3.addWidget(self.label)
 
 
         self.verticalLayout_2.addLayout(self.qlin3)
@@ -365,15 +380,16 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Multi Downloader", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"SaveVideo", None))
         self.btn_menu.setText("")
-        self.lbl_titulo.setText(QCoreApplication.translate("MainWindow", u"Multi Downloader", None))
-        self.lbl_desc.setText(QCoreApplication.translate("MainWindow", u"Baixe V\u00eddeos Do TikTok, Instagram e Youtube", None))
+        self.lbl_titulo.setText(QCoreApplication.translate("MainWindow", u"SaveVideo", None))
+        self.lbl_desc.setText(QCoreApplication.translate("MainWindow", u"Baixe V\u00eddeos Em Lote Do TikTok, Instagram e Youtube", None))
         self.btn_colar.setText(QCoreApplication.translate("MainWindow", u"Colar Links", None))
         self.btn_excluir.setText(QCoreApplication.translate("MainWindow", u"Excluir Link", None))
         self.btn_limpar.setText(QCoreApplication.translate("MainWindow", u"Limpar Links", None))
         self.btn_pasta.setText(QCoreApplication.translate("MainWindow", u"Onde Salvar", None))
         self.btn_baixar.setText(QCoreApplication.translate("MainWindow", u"Baixar", None))
-        self.lbl_rodape.setText(QCoreApplication.translate("MainWindow", u"Suporte", None))
+        self.lbl_rodape.setText(QCoreApplication.translate("MainWindow", u"Desenvolvido por Igor Lem\u00f5es - Contato em todas as redes sociais - Suporte via WhatApp (53) 99156-5693", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"Licen\u00e7a para uso pessoal e intransfer\u00edvel | https://robozinhos.com.br | https://igorlemoes.com.br", None))
     # retranslateUi
 

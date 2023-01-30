@@ -13,10 +13,44 @@
   <property name="windowTitle">
    <string>Avisos Do Sistema</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icons/savevideo.ico</normaloff>icons/savevideo.ico</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">*{
+	background-color: rgb(26, 26, 26);
+}
+QLineEdit, QPushButton, QLabel{
+	color: rgb(255, 255, 255);
+}
+QPushButton{
+	border-radius: 5;
+	background-color: rgb(68, 68, 68);
+}
+QPushButton:hover{
+	background-color: rgb(108, 108, 108);
+}
+QLineEdit{
+	background-color: rgb(225, 225, 225);
+	color: rgb(68, 68, 68);
+}
+a{
+	color: rgb(85, 255, 127);
+}</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QLabel" name="lbl_msg">
+      <property name="font">
+       <font>
+        <pointsize>16</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(85, 170, 127);</string>
+      </property>
       <property name="text">
        <string>TextLabel</string>
       </property>
@@ -29,11 +63,15 @@
      <widget class="QLabel" name="lbl_link">
       <property name="font">
        <font>
+        <pointsize>12</pointsize>
         <underline>true</underline>
        </font>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(85, 255, 127);</string>
       </property>
       <property name="text">
        <string>TextLabel</string>

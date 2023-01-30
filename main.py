@@ -336,40 +336,16 @@ def onde_salvar():
         salvar_como = fileNames.path()
         print(salvar_como)
         window.edit_local.setText(salvar_como)
-
-
-def registrador():
-    try:
-        url = url_verifica_mac+getmac.get_mac_address()
-        print(url)
-        register_response = requests.get(url, timeout=5)
-        print(register_response)
-    except:
-        exibir_mbox(
-            'Verifique sua conexão com a internet, não foi possível validar sua licença de uso do software!')
-        sys.exit(0)
-
-
-    if register_response.status_code >= 200 and register_response.status_code <= 299:
-        registro.close()
         
-        response_update = register_response.json()
-        if response_update['version'] > versao_robo:
-            print(response_update['version'])
-        #     window_download(response_update['version'], response_update['url'])
-        window.show()
-    else:
-        exibir_mbox('Seu registro não foi encontrado, Preencha o Nome e o e-mail utilizados na compra')
-        registro.show()
         
-def func_verifica_registro():
+def func_verifica_mac():
     try:
-        print(getmac.get_mac_address())
+        # print(getmac.get_mac_address())
         dados = {
                 'id_produto': id_produto,
                 'mac': getmac.get_mac_address()
             }
-        retorno_verifica_registro = requests.post(url=url_verifica_registro, json=dados)
+        retorno_verifica_registro = requests.post(url=url_verifica_mac, json=dados)
     except:
         exibir_mbox(
             'Verifique sua conexão com a internet, não foi possível validar sua licença de uso do software!')
@@ -381,11 +357,12 @@ def func_verifica_registro():
         
         response_update = retorno_verifica_registro.json()
         if response_update['version'] > versao_robo:
-            print(response_update['version'])
-        #     window_download(response_update['version'], response_update['url'])
+            # print(response_update['version'])
+            # window_download(response_update['version'], response_update['url'])
             avisos.lbl_msg.setText(response_update['mensagem'])
             
-            urlLink="<a href="+response_update['url']+">"+response_update['url']+"</a>"
+            # urlLink="<a href="+response_update['url']+">"+response_update['url']+"</a>"
+            urlLink="<a href="+response_update['url']+"><span style='text-decoration: underline; color:#55ff7f;'>"+response_update['url']+"</span></a>"
             avisos.lbl_link.setText(urlLink)
             window.show()
             avisos.show()
@@ -394,23 +371,28 @@ def func_verifica_registro():
         exibir_mbox('Seu registro não foi encontrado, Preencha o Nome e o e-mail utilizados na compra')
         registro.show()
 
-def retorna_dados_registro():
+def func_cadastra_mac_email_nome():
     nome=registro.edit_nome.text()
     email=registro.edit_email.text()
-    # window.show()
-    dados = {
-                'nome': nome,
-                'email': email,
-                'id_produto': id_produto,
-                'mac': getmac.get_mac_address()
-            }
-    cadastro_response = requests.post(url=url_verifica_email_e_registra, json=dados)
+    try:
+        # window.show()
+        dados = {
+                    'nome': nome,
+                    'email': email,
+                    'id_produto': id_produto,
+                    'mac': getmac.get_mac_address()
+                }
+        cadastro_response = requests.post(url=url_cadastra_mac_email_nome, json=dados)
+    except:
+        exibir_mbox(
+            'Verifique sua conexão com a internet, não foi possível validar sua licença de uso do software!')
+        sys.exit(0)
 
     if cadastro_response.status_code >= 200 and cadastro_response.status_code <= 299:
         registro.close()
         window.show()
     else:
-        func_verifica_registro()
+        func_verifica_mac()
 
 
 def exibir_mbox(mensagem):
@@ -472,14 +454,11 @@ if __name__ == "__main__":
 
 
 
-    # registrador()
-    func_verifica_registro()
+    func_verifica_mac()
 
-    registro.btn_registrar.clicked.connect(retorna_dados_registro)
+    registro.btn_registrar.clicked.connect(func_cadastra_mac_email_nome)
 
     
-
-
     # Abrir Menu
     window.btn_menu.clicked.connect(animarMenu)
     window.btn_menu.setIcon(QtGui.QIcon(os.path.join(resource_path('./icons/menu.svg'))))
