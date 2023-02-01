@@ -206,6 +206,16 @@ class DownloaderTT(QThread):
             window.list_links.takeItem(0)
             return
 
+class MyLogger(object):
+    def debug(self, msg):
+        pass
+
+    def warning(self, msg):
+        pass
+
+    def error(self, msg):
+        print(msg)
+
 class DownloaderYT(QThread):
     new_value = Signal(int)
     url = ''
@@ -224,7 +234,9 @@ class DownloaderYT(QThread):
                 'format': 'best[ext=mp4][height>480]',
                 'outtmpl': salvar_como+'/youtube/'+ '%(title)s' + '.mp4',
                 'progress_hooks': [self.yt_on_progress],
+                'logger': MyLogger(),
             }
+            
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([self.url])
                 
