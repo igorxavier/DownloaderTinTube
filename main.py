@@ -35,7 +35,7 @@ def resource_path(relative_path = ''):
 
 # salvar_como = resource_path('baixados')
 
-salvar_como = str(pathlib.Path.home() / 'Desktop')
+salvar_como = str(pathlib.Path.home())
 
 def colarItems():
     clipboard = QtGui.QGuiApplication.clipboard()
