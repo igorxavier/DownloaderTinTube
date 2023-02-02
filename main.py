@@ -341,7 +341,7 @@ def iniciar_lista():
 
 def onde_salvar():
     global salvar_como
-    dialog = QFileDialog()
+    dialog = QFileDialog(directory=salvar_como)
     dialog.setFileMode(QFileDialog.Directory)
 
     if dialog.exec_():
