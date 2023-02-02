@@ -516,6 +516,8 @@ if __name__ == "__main__":
     window.btn_pasta.clicked.connect(onde_salvar)
     
     window.edit_local.setText(salvar_como)
+
+    window.lbl_versao.setText(versao_robo)
     
     
     window.pro_bar.setValue(0)
