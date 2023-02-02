@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import pathlib
 
 import getmac
 import instaloader
@@ -29,10 +30,12 @@ def resource_path(relative_path = ''):
 
 ###############################################################################
 
-if not os.path.exists(resource_path('baixados')):
-    os.makedirs(resource_path('baixados'))
+# if not os.path.exists(resource_path('baixados')):
+#     os.makedirs(resource_path('baixados'))
 
-salvar_como = resource_path('baixados')
+# salvar_como = resource_path('baixados')
+
+salvar_como = str(pathlib.Path.home() / 'Desktop')
 
 def colarItems():
     clipboard = QtGui.QGuiApplication.clipboard()
