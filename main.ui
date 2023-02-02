@@ -762,6 +762,21 @@ QPushButton:hover{
                <number>0</number>
               </property>
               <item>
+               <widget class="QLabel" name="lbl_pro_bar">
+                <property name="font">
+                 <font>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">color: rgb(85, 170, 127);</string>
+                </property>
+                <property name="text">
+                 <string>Aguardando...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QProgressBar" name="pro_bar">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
@@ -1080,7 +1095,7 @@ color: rgb(64, 64, 64);</string>
           <number>5</number>
          </property>
          <item>
-          <widget class="QLabel" name="lbl_rodape">
+          <widget class="QLabel" name="lbl_rodape1">
            <property name="text">
             <string>Desenvolvido por Igor Lemões - Contato em todas as redes sociais - Suporte via WhatApp (53) 99156-5693</string>
            </property>
@@ -1090,7 +1105,7 @@ color: rgb(64, 64, 64);</string>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label">
+          <widget class="QLabel" name="lbl_rodape2">
            <property name="text">
             <string>Licença para uso pessoal e intransferível | https://robozinhos.com.br | https://igorlemoes.com.br</string>
            </property>

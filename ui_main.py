@@ -278,6 +278,15 @@ class Ui_MainWindow(object):
         self.verticalLayout_4 = QVBoxLayout()
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(9, 0, 9, 0)
+        self.lbl_pro_bar = QLabel(self.qcol2_2)
+        self.lbl_pro_bar.setObjectName(u"lbl_pro_bar")
+        font3 = QFont()
+        font3.setBold(True)
+        self.lbl_pro_bar.setFont(font3)
+        self.lbl_pro_bar.setStyleSheet(u"color: rgb(85, 170, 127);")
+
+        self.verticalLayout_4.addWidget(self.lbl_pro_bar)
+
         self.pro_bar = QProgressBar(self.qcol2_2)
         self.pro_bar.setObjectName(u"pro_bar")
         sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
@@ -354,17 +363,17 @@ class Ui_MainWindow(object):
         self.qlin3.setSpacing(0)
         self.qlin3.setObjectName(u"qlin3")
         self.qlin3.setContentsMargins(-1, 5, -1, 5)
-        self.lbl_rodape = QLabel(self.widget)
-        self.lbl_rodape.setObjectName(u"lbl_rodape")
-        self.lbl_rodape.setAlignment(Qt.AlignCenter)
+        self.lbl_rodape1 = QLabel(self.widget)
+        self.lbl_rodape1.setObjectName(u"lbl_rodape1")
+        self.lbl_rodape1.setAlignment(Qt.AlignCenter)
 
-        self.qlin3.addWidget(self.lbl_rodape)
+        self.qlin3.addWidget(self.lbl_rodape1)
 
-        self.label = QLabel(self.widget)
-        self.label.setObjectName(u"label")
-        self.label.setAlignment(Qt.AlignCenter)
+        self.lbl_rodape2 = QLabel(self.widget)
+        self.lbl_rodape2.setObjectName(u"lbl_rodape2")
+        self.lbl_rodape2.setAlignment(Qt.AlignCenter)
 
-        self.qlin3.addWidget(self.label)
+        self.qlin3.addWidget(self.lbl_rodape2)
 
 
         self.verticalLayout_2.addLayout(self.qlin3)
@@ -389,7 +398,8 @@ class Ui_MainWindow(object):
         self.btn_limpar.setText(QCoreApplication.translate("MainWindow", u"Limpar Links", None))
         self.btn_pasta.setText(QCoreApplication.translate("MainWindow", u"Onde Salvar", None))
         self.btn_baixar.setText(QCoreApplication.translate("MainWindow", u"Baixar", None))
-        self.lbl_rodape.setText(QCoreApplication.translate("MainWindow", u"Desenvolvido por Igor Lem\u00f5es - Contato em todas as redes sociais - Suporte via WhatApp (53) 99156-5693", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Licen\u00e7a para uso pessoal e intransfer\u00edvel | https://robozinhos.com.br | https://igorlemoes.com.br", None))
+        self.lbl_pro_bar.setText(QCoreApplication.translate("MainWindow", u"Aguardando...", None))
+        self.lbl_rodape1.setText(QCoreApplication.translate("MainWindow", u"Desenvolvido por Igor Lem\u00f5es - Contato em todas as redes sociais - Suporte via WhatApp (53) 99156-5693", None))
+        self.lbl_rodape2.setText(QCoreApplication.translate("MainWindow", u"Licen\u00e7a para uso pessoal e intransfer\u00edvel | https://robozinhos.com.br | https://igorlemoes.com.br", None))
     # retranslateUi
 

@@ -14,6 +14,7 @@ from PySide6.QtWidgets import QFileDialog, QMessageBox
 
 from configs import *
 from tikdown import TikDown
+from ttdownloader import TTDownloader
 
 ##############################################################################
 ### Código que resolve os problemas para encontrar arquivos no pyinstaller ###
@@ -130,6 +131,7 @@ class DownloaderIT(QThread):
             
             if video_url:
                 self.new_value.emit(0)
+                window.lbl_pro_bar.setText('Baixando...')
                 
                 response = requests.get(video_url, stream=True,)            
                 total_length = response.headers.get('content-length')
@@ -157,6 +159,7 @@ class DownloaderIT(QThread):
                 
             elif photo_url:
                 self.new_value.emit(0)
+                window.lbl_pro_bar.setText('Baixando...')
                 
                 response = requests.get(photo_url)
                 with open(salvar_como+'/instagram/'+post.owner_username+'/'+timestr+'.png', "wb") as f:
@@ -168,6 +171,7 @@ class DownloaderIT(QThread):
 
         except:
             print('Não foi possível realizar o download')
+            window.lbl_pro_bar.setText('Erro, pulando pra o próximo...')
             window.list_links.takeItem(0)
             return
             
@@ -183,6 +187,7 @@ class DownloaderTT(QThread):
 
     def run(self):
         self.new_value.emit(0)
+        window.lbl_pro_bar.setText('Baixando...')
 
         try:
 
@@ -205,9 +210,31 @@ class DownloaderTT(QThread):
             window.list_links.takeItem(0)
 
         except:
-            print('Não foi possível realizar o download')
-            window.list_links.takeItem(0)
-            return
+            try:
+                d=TTDownloader(self.url)
+
+                nome = self.url.partition(".com/@")[2].partition("/video/")[0]
+
+                timestr = time.strftime("%Y%m%d-%H%M%S")
+
+                if not os.path.exists(salvar_como+'/tiktok'):
+                    os.makedirs(salvar_como+'/tiktok')
+
+                if not os.path.exists(salvar_como+'/tiktok/'+nome):
+                    os.makedirs(salvar_como+'/tiktok/'+nome)
+
+                d[0].download(salvar_como+'/tiktok/'+nome+'/'+timestr+'.mp4', bar=self.tt_on_progress)
+                
+                self.new_value.emit(100)
+                
+                window.list_links.takeItem(0)
+
+            except:
+
+                print('Não foi possível realizar o download')
+                window.lbl_pro_bar.setText('Erro, pulando pra o próximo...')
+                window.list_links.takeItem(0)
+                return
 
 class MyLogger(object):
     def debug(self, msg):
@@ -227,6 +254,7 @@ class DownloaderYT(QThread):
 
     def run(self):
         self.new_value.emit(0)
+        window.lbl_pro_bar.setText('Baixando...')
 
         if not os.path.exists(salvar_como+'/youtube'):
             os.makedirs(salvar_como+'/youtube')
@@ -247,6 +275,7 @@ class DownloaderYT(QThread):
                 
         except:
             print('Não foi possível realizar o download')
+            window.lbl_pro_bar.setText('Erro, pulando pra o próximo...')
             window.list_links.takeItem(0)
             return
 
@@ -324,7 +353,7 @@ class IniciarLista(QThread):
                 )):        
                     it.url = window.list_links.item(0).text()
                     it.start()
-                    
+            window.lbl_pro_bar.setText('Concluído...')       
         else:
             print('Esta vazio')
 
