@@ -41,7 +41,7 @@ salvar_como = str(pathlib.Path.home())
 def colarItems():
     clipboard = QtGui.QGuiApplication.clipboard()
     originalText = clipboard.text()
-    lines = originalText.split(os.linesep)
+    lines = originalText.splitlines()
 
     for line in lines:
         
